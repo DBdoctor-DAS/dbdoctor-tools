@@ -4,17 +4,45 @@ config.py - Configuration Management Module
 Reads DBDoctor configuration from system environment variables or .env file:
   - DBDOCTOR_URL: API base URL
   - DBDOCTOR_USER: Login username
-  - DBDOCTOR_PASSWORD: Login password (plaintext)
+  - DBDOCTOR_PASSWORD: Login password (encrypted at rest in .env)
 
 Priority: System environment variables > .env file > Interactive input
 """
 
 import os
 import sys
+import base64
 from pathlib import Path
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 # List of required environment variables
 _REQUIRED_ENV_VARS = ("DBDOCTOR_URL", "DBDOCTOR_USER", "DBDOCTOR_PASSWORD")
+
+# Storage encryption key (for .env file at-rest encryption only)
+_STORAGE_KEY = b"dbdoctor-tools!!dbdoctor-tools!!"  # 32 bytes for AES-256
+
+# Prefix to identify encrypted values
+_ENC_PREFIX = "ENC:"
+
+
+def _encrypt_for_storage(plaintext: str) -> str:
+    """Encrypt a value for storage in .env file, return ENC: prefixed string."""
+    cipher = AES.new(_STORAGE_KEY, AES.MODE_ECB)
+    padded = pad(plaintext.encode("utf-8"), AES.block_size)
+    encrypted = cipher.encrypt(padded)
+    return _ENC_PREFIX + base64.b64encode(encrypted).decode("utf-8")
+
+
+def _decrypt_from_storage(value: str) -> str:
+    """Decrypt an ENC: prefixed value from .env file. Returns plaintext as-is."""
+    if not value.startswith(_ENC_PREFIX):
+        return value
+    encrypted = base64.b64decode(value[len(_ENC_PREFIX):])
+    cipher = AES.new(_STORAGE_KEY, AES.MODE_ECB)
+    decrypted = unpad(cipher.decrypt(encrypted), AES.block_size)
+    return decrypted.decode("utf-8")
 
 
 class ConfigError(Exception):
@@ -77,17 +105,19 @@ def interactive_init():
 
 def generate_env_file(url, user, password):
     """
-    Generate .env configuration file
+    Generate .env configuration file with encrypted password.
     
     Args:
         url: DBDoctor URL
         user: Username
-        password: Password
+        password: Password (plaintext, will be encrypted before storage)
     
     Returns:
         Path: Path to the generated file
     """
     env_path = Path(__file__).parent.parent / '.env'
+    
+    encrypted_password = _encrypt_for_storage(password)
     
     env_content = f"""# DBDoctor Configuration File
 # This file is auto-generated and contains sensitive information.
@@ -99,8 +129,8 @@ DBDOCTOR_URL={url}
 # Login Username (also used as UserId)
 DBDOCTOR_USER={user}
 
-# Login Password (stored in plaintext, will be AES encrypted by the program)
-DBDOCTOR_PASSWORD={password}
+# Login Password (AES encrypted at rest, decrypted automatically at runtime)
+DBDOCTOR_PASSWORD={encrypted_password}
 """
     
     # Write file
@@ -188,7 +218,7 @@ class Config:
 
         self.base_url = os.environ["DBDOCTOR_URL"]
         self.username = os.environ["DBDOCTOR_USER"]
-        self.password = os.environ["DBDOCTOR_PASSWORD"]
+        self.password = _decrypt_from_storage(os.environ["DBDOCTOR_PASSWORD"])
         # Username is used as UserId
         self.user_id = self.username
         # Role hardcoded as dev

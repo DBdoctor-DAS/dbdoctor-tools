@@ -1,6 +1,24 @@
 ---
 name: dbdoctor-tools
-description: DBDoctor database performance diagnosis platform tools. Invoke when user needs to query database instances, slow SQL, inspection reports, performance metrics, or perform SQL audit/rewrite operations.
+description: >
+  DBDoctor database performance diagnosis platform tools.
+  Invoke when user needs to query database instances, slow SQL,
+  inspection reports, performance metrics, or perform SQL audit/rewrite operations.
+license: Apache-2.0
+compatibility: Requires Python 3.9+ with requests, pycryptodome, python-dotenv packages. Network access to DBDoctor API server required.
+allowed-tools: Bash Read
+requires:
+  env:
+    - DBDOCTOR_URL
+    - DBDOCTOR_USER
+    - DBDOCTOR_PASSWORD
+  commands:
+    - python
+    - pip
+metadata:
+  author: DBdoctor-DAS
+  version: 1.0.0
+  tags: [database, performance, diagnosis, slow-sql, sql-audit, monitoring, dbdoctor]
 ---
 
 ## Quick Start Examples

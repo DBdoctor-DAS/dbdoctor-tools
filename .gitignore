@@ -1,6 +1,7 @@
 # DBDoctor 配置文件（含敏感信息）
 .dbdoctor
 .env
+.qoder
 
 # Token 缓存文件
 .token_cache
@@ -17,3 +18,5 @@ __pycache__/
 # Node
 node_modules/
 package-lock.json
+package.json
+.npmignore
