@@ -1,0 +1,21 @@
+# Environment and secrets
+.env
+.dbdoctor
+.token_cache
+
+# Python cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# IDE
+.idea/
+.vscode/
+
+# Qoder internal
+.qoder/
+openspec/
+
+# Git
+.git/
+.gitignore
