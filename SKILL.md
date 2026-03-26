@@ -17,7 +17,7 @@ requires:
     - pip
 metadata:
   author: DBdoctor-DAS
-  version: 1.0.0
+  version: 1.0.1
   tags: [database, performance, diagnosis, slow-sql, sql-audit, monitoring, dbdoctor]
 ---
 
@@ -104,11 +104,14 @@ System environment variables > `.env` file > Interactive input
 
 **Alternative: Manual .env File Creation**
 
-If you prefer manual configuration, create `.env` file:
-```bash
-cp .env.example .env  # or copy .env.example .env on Windows
-# Edit .env with your settings
+If you prefer manual configuration, create `.env` file in project root with the following content:
 ```
+DBDOCTOR_URL=http://[host]:[port]
+DBDOCTOR_USER=[username]
+DBDOCTOR_PASSWORD=[password]
+```
+
+> **Security Note**: Passwords written in plaintext will be automatically AES-encrypted (prefixed with `ENC:`) on first load. After that, the `.env` file will contain only the encrypted value.
 
 **Alternative: System Environment Variables (Temporary)**
 ```bash
@@ -244,11 +247,14 @@ Configuration is automatically saved to `.env` file and will be loaded in all su
 
 **Option 1: Manual .env File Creation**
 
-Create `.env` file in project root:
-```bash
-cp .env.example .env  # Windows: copy .env.example .env
-# Edit .env with your settings
+Create `.env` file in project root with the following content:
 ```
+DBDOCTOR_URL=http://[host]:[port]
+DBDOCTOR_USER=[username]
+DBDOCTOR_PASSWORD=[password]
+```
+
+> **Security Note**: Passwords written in plaintext will be automatically AES-encrypted (prefixed with `ENC:`) on first load. After that, the `.env` file will contain only the encrypted value.
 
 **Option 2: System Environment Variables (Temporary)**
 ```bash

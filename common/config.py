@@ -146,6 +146,45 @@ DBDOCTOR_PASSWORD={encrypted_password}
     return env_path
 
 
+def _auto_encrypt_env_password():
+    """
+    Check .env file and auto-encrypt plaintext DBDOCTOR_PASSWORD in place.
+    If the password value does not start with ENC: prefix, encrypt it and rewrite the file.
+    """
+    env_path = Path(__file__).parent.parent / '.env'
+    if not env_path.exists():
+        return
+
+    try:
+        content = env_path.read_text(encoding='utf-8')
+    except Exception:
+        return
+
+    lines = content.splitlines(keepends=True)
+    new_lines = []
+    changed = False
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("DBDOCTOR_PASSWORD="):
+            value = stripped[len("DBDOCTOR_PASSWORD="):]
+            if value and not value.startswith(_ENC_PREFIX):
+                encrypted = _encrypt_for_storage(value)
+                new_lines.append(f"DBDOCTOR_PASSWORD={encrypted}\n")
+                # Also update the environment variable so dotenv picks up the encrypted value
+                os.environ["DBDOCTOR_PASSWORD"] = encrypted
+                changed = True
+                continue
+        new_lines.append(line)
+
+    if changed:
+        env_path.write_text("".join(new_lines), encoding='utf-8')
+        try:
+            os.chmod(env_path, 0o600)
+        except Exception:
+            pass
+
+
 def try_load_dotenv():
     """Try to load .env file"""
     try:
@@ -153,6 +192,8 @@ def try_load_dotenv():
         env_path = Path(__file__).parent.parent / '.env'
         if env_path.exists():
             load_dotenv(dotenv_path=env_path)
+            # Auto-encrypt plaintext password if found
+            _auto_encrypt_env_password()
             return True
     except ImportError:
         pass
@@ -191,7 +232,7 @@ class Config:
                         f"   DBDOCTOR_USER=[username]\n"
                         f"   DBDOCTOR_PASSWORD=[password]\n"
                         f"2. Run in an interactive terminal for guided configuration\n"
-                        f"3. Manually create .env file (see .env.example)"
+                        f"3. Manually create .env file with DBDOCTOR_URL, DBDOCTOR_USER, DBDOCTOR_PASSWORD"
                     )
                 
                 # Interactive initialization
