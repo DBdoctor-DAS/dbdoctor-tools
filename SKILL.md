@@ -1,11 +1,11 @@
 ---
 name: dbdoctor-tools
 description: >
-  DBDoctor database performance diagnosis platform tools.
+  DBdoctor database performance diagnosis platform tools.
   Invoke when user needs to query database instances, slow SQL,
   inspection reports, performance metrics, or perform SQL audit/rewrite operations.
 license: Apache-2.0
-compatibility: Requires Python 3.9+ with requests, pycryptodome, python-dotenv packages. Network access to DBDoctor API server required.
+compatibility: Requires Python 3.9+ with requests, pycryptodome, python-dotenv packages. Network access to DBdoctor API server required.
 allowed-tools: Bash Read
 requires:
   env:
@@ -68,8 +68,8 @@ python scripts/ai_sql_rewrite.py --instance-id [instance_id] --database [db] --s
 
 This skill supports two authentication modes:
 
-- **Mode 1 - Password login** (one-click launch version): Requires `DBDOCTOR_URL`, `DBDOCTOR_USER`, `DBDOCTOR_PASSWORD`.
-- **Mode 2 - Email verification code login** (free version, Windows/Mac): Requires `DBDOCTOR_URL`, `DBDOCTOR_EMAIL`. When a verification code is needed, the user will be prompted interactively.
+- **Mode 1 - Password login** (企业版（免费试用）): Requires `DBDOCTOR_URL`, `DBDOCTOR_USER`, `DBDOCTOR_PASSWORD`.
+- **Mode 2 - Email verification code login** (免费版（永久免费）, Windows/Mac): Requires `DBDOCTOR_URL`, `DBDOCTOR_EMAIL`. When a verification code is needed, the user will be prompted interactively.
 
 If `DBDOCTOR_EMAIL` is configured, email mode takes precedence.
 
@@ -82,7 +82,7 @@ Two tools perform write operations that require operator care:
 - **execute\_sql**: Executes arbitrary SQL on the target database. Review all SQL statements before execution. The tool does not enforce read-only restrictions.
 - **manage\_instance**: Registers new database instances to the platform. Verify all connection parameters (IP, port, credentials) before execution.
 
-All other tools are read-only queries against the DBDoctor API.
+All other tools are read-only queries against the DBdoctor API.
 
 ### Authentication Mechanism
 
@@ -101,14 +101,14 @@ Set the following environment variables based on your login mode:
 
 | Variable | Description | Required |
 | --- | --- | --- |
-| DBDOCTOR\_URL | DBDoctor API base URL (e.g. `http://host:port`) | Always |
+| DBDOCTOR\_URL | DBdoctor API base URL (e.g. `http://host:port`) | Always |
 | DBDOCTOR\_USER | Login username (also used as UserId) | Password mode only |
 | DBDOCTOR\_PASSWORD | Login password (sensitive) | Password mode only |
 | DBDOCTOR\_EMAIL | Login email for verification code | Email mode only |
 
 > **Note**: If `DBDOCTOR_EMAIL` is set, email verification code mode is used. Otherwise, username/password mode is used.
 
-### Mode 1: Password login (one-click launch version)
+### Mode 1: Password login (企业版（免费试用）)
 
 ```bash
 # CLI configuration (recommended)
@@ -117,7 +117,7 @@ clawdbot skills config dbdoctor-tools DBDOCTOR_USER "[username]"
 clawdbot skills config dbdoctor-tools DBDOCTOR_PASSWORD "[password]"
 ```
 
-### Mode 2: Email verification code login (free version)
+### Mode 2: Email verification code login (免费版（永久免费）)
 
 ```bash
 # CLI configuration (recommended)
