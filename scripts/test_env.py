@@ -10,7 +10,7 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from common.config import config
+from common.config import config, LOGIN_MODE_PASSWORD, LOGIN_MODE_EMAIL
 
 
 def test_env_loading():
@@ -19,23 +19,31 @@ def test_env_loading():
     print("Testing .env Configuration Loading")
     print("=" * 60)
     
-    # Check if environment variables exist
+    # Check common environment variables
     url = os.environ.get("DBDOCTOR_URL")
+    print(f"\n✓ DBDOCTOR_URL: {url if url else '❌ NOT SET'}")
+
+    # Check mode-specific environment variables
+    email = os.environ.get("DBDOCTOR_EMAIL")
     user = os.environ.get("DBDOCTOR_USER")
     password = os.environ.get("DBDOCTOR_PASSWORD")
-    
-    print(f"\n✓ DBDOCTOR_URL: {url if url else '❌ NOT SET'}")
-    print(f"✓ DBDOCTOR_USER: {user if user else '❌ NOT SET'}")
-    print(f"✓ DBDOCTOR_PASSWORD: {'***' if password else '❌ NOT SET'}")
+
+    print(f"✓ DBDOCTOR_EMAIL: {email if email else '(not set)'}")
+    print(f"✓ DBDOCTOR_USER: {user if user else '(not set)'}")
+    print(f"✓ DBDOCTOR_PASSWORD: {'***' if password else '(not set)'}")
     
     # Check config object
     print("\n" + "=" * 60)
     print("Config Object Values:")
     print("=" * 60)
     try:
+        print(f"✓ Login Mode: {config.login_mode}")
         print(f"✓ Base URL: {config.base_url}")
-        print(f"✓ Username: {config.username}")
-        print(f"✓ Password: {'***' if config.password else '❌ EMPTY'}")
+        if config.login_mode == LOGIN_MODE_PASSWORD:
+            print(f"✓ Username: {config.username}")
+            print(f"✓ Password: {'***' if config.password else '❌ EMPTY'}")
+        else:
+            print(f"✓ Email: {config.email}")
         print(f"✓ User ID: {config.user_id}")
         print(f"✓ Role: {config.role}")
         print("\n✅ Configuration loaded successfully!")

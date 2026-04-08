@@ -7,6 +7,8 @@ Responsibilities:
   - Auto refresh and retry once when token expires
 """
 
+import sys
+
 import requests as _requests
 
 from common.auth import get_token, refresh_token
@@ -56,6 +58,7 @@ def get(path: str, params: dict | None = None) -> dict:
 
     # Refresh and retry once when token expires
     if _is_auth_failure(resp):
+        print("Token expired. Re-authentication required...", file=sys.stderr)
         token = refresh_token()
         resp = _requests.get(url, params=params, headers=_build_headers(token), verify=False, timeout=30)
 
@@ -80,6 +83,7 @@ def post(path: str, params: dict | None = None, json_body: dict | None = None) -
 
     # Refresh and retry once when token expires
     if _is_auth_failure(resp):
+        print("Token expired. Re-authentication required...", file=sys.stderr)
         token = refresh_token()
         resp = _requests.post(url, params=params, json=json_body, headers=_build_headers(token), verify=False, timeout=30)
 
